@@ -1,5 +1,4 @@
 #-*-coding: utf-8-*-
-# 위에 코드 지우면 안 됨, 샵도 그대로 둬야함
 from flask import Flask, render_template, request, url_for
 import subprocess
 import sys
@@ -16,9 +15,6 @@ from io import open
 from bible_people.convert_PN import convert_pn_for_web
 import pickle
 import operator
-
-#참조  https://www.fun-coding.org/flask_basic-2.html
-#Usage : "python3 run_web.py"
 
 # 하이퍼파라미터
 parser = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter)
@@ -91,15 +87,12 @@ def setting():
 
     key_file.close()
 
-    ###영어(밸류)기준으로 긴단어부터해서 정렬
-    # print("ch1 : ", type(PN_dict))
+    ###영어(밸류)기준으로 긴 단어부터해서 정렬
     ###딕트를 정렬하니까 리스트로 바뀜
     PN_list= sorted(PN_dict.items(), key=operator.itemgetter(1), reverse=True)
-    # print("ch2 : ", type(PN_dict))
     print("ch3 : ", type(PN_list[0][0]))
     print(PN_list[0][0])
     print(PN_list[0][1])
-    # print(PN_dict)
 
     print(len(PN_list))
 
@@ -128,7 +121,6 @@ def hello():
 
 @app.route('/k2e_trans', methods=['POST', 'GET'])
 def k2e_trans(num=None):
-    #야매임
     if request.method == 'GET':
         return render_template("k2e.html")
     if request.method == 'POST':
@@ -174,7 +166,6 @@ def k2e_trans(num=None):
                                  ahead=1, resume_num=0)
         for x_data, x_mask, cur_line, iloop in valid_iter:
             samples = translate_beam_1(k2e_model, x_data, args)
-            # print("samples : ", samples)
             output = ids2words(k2e_trg_inv_dict, samples, eos_id=EOS_token)
             output = unbpe(output)
 
@@ -197,24 +188,12 @@ def k2e_trans(num=None):
             if key in output:
                 output=output.replace(key,value)
 
-        #__P0같은거 원래대로 변환
+        #__P0 같은거 원래대로 변환
         for key, val in info_dict.items(): #key : __P0, val : 예수(한국어)
-            # print("key : " + key)
-            # print("val : " + val)
             temp = key.strip()
             if temp in output:
-                # print("key2 : " + key)
-                # print("val2 : " + val)
                 for (PN_key, PN_val) in PN_list :
-                # for PN_key, PN_val in PN_dict.items():
                     if val == PN_key:
-                        # print("key : " + key)
-                        # print("val : " + val)
-                        # print("PN_key : " + PN_key)
-                        # print("PN_val : " + PN_val)
-
-                        # print("temp : " + temp + "\n")
-                        # output = output.replace(key, PN_val)
                         output = output.replace(temp, PN_val)
 
 
@@ -230,7 +209,6 @@ def e2k_trans(num=None):
     if request.method == 'GET':
         return render_template("e2k.html")
     if request.method == 'POST':
-        print("test2")
         if request.form['src'] == "":
             return render_template("e2k.html")
         input_sen = request.form['src']
@@ -256,7 +234,6 @@ def e2k_trans(num=None):
         print("trans_kr : ",output)
         return render_template('e2k.html', src_contents = input_sen, trans_contents = output)
     else:
-        print("test3")
         return render_template("e2k.html")
 
 
