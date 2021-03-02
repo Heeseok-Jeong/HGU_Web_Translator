@@ -8,8 +8,6 @@ import pickle
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-# SRC_FILE = './bible_people/bible_data_GYGJ+NIV/bible_data_test.kr.shuf.tok'
-# TRG_FILE = './bible_people/bible_data_GYGJ+NIV/bible_data_test.en.shuf.tok'
 SRC_FILE = './input.txt.tok'
 TRG_FILE = './input.en.tok'
 
@@ -22,9 +20,6 @@ kr_word = [u'십', u'백', u'천', u'만', u'억']
 kr_num = ['10', '100', '1000', '10000', '100000000']
 
 symbol = ["__N0", "__N1", "__N2", "__N3", "__N4", "__N5", "__N6", "__N7", "__N8", "__N9", "__MM"]
-
-#parser = argparse.ArgumentParse(description=''' hello ''', formatter_class=argparse.RawTextHelpFormatter)
-
 
 def symbolize_kr(line):
 	kr_line = line.decode('UTF-8')
@@ -74,8 +69,6 @@ def symbolize_kr2en(train_kr=SRC_FILE, train_en=TRG_FILE):
 		en_line = en_in.readline()
 		if not kr_line or not en_line:
 			break
-		#kr_out.write(kr_line)
-		#en_out.write(en_line)
 
 		en_line = en_line.replace("\n", " ")
 		for i in range(len(wordnum)):
@@ -109,25 +102,24 @@ def symbolize_kr2en(train_kr=SRC_FILE, train_en=TRG_FILE):
 		2. __N0를 번역되면 영어로 __N0이 포함된 문장이 나옴. (이건 번역 과정 ) / 영어 __N0->저장된 숫자로 바꾸기.
 		ex) I'am __N0 -> I'am 17
        '''
-        #print('1  ',en_line) # ' '
+       
         kr_line = " ".join(kr_words)
         en_line = " ".join(en_words)
-        # print(kr_line)
-        # print(en_line)
-        #print('2  ',en_line) #'I am __N0 years old. '
+	
         kr_out.write(kr_line + "\n")
         en_out.write(en_line + "\n")
 
         loop_count += 1
         if loop_count % 100000 == 0:
 			print (str(loop_count) + ' lines have been done')
-	#mapping_out에 dict 저장.
+	
 	pickle.dump(dict_vo,mapping_out)
-	print dict_vo
 	kr_in.close()
 	kr_out.close()
 	en_in.close()
 	en_out.close()
+	
+	# mapping_out에 dict 저장.
 	mapping_out.close()
 
 def number_unit_kr(line, phase):
@@ -321,10 +313,6 @@ def replace2(split, index, old, new,mapping_out):
 			split[i] = new
 			dict_vo[new]=old
 
-
-			#mapping_out.write(dict_vo)
-
-			#print dict_vo[0]
 def replace22(split, index, old, new):
 	for i in index:
 		if split[i] == old:
@@ -334,4 +322,3 @@ def replace22(split, index, old, new):
 if __name__ == "__main__":
         symbolize_kr2en()
 
-		#symbolize_kr('I love three')
