@@ -16,7 +16,7 @@ from bible_people.convert_PN import convert_pn_for_web
 import pickle
 import operator
 
-# 하이퍼파라미터
+# 하이퍼파라미터 세팅
 parser = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter)
 parser.add_argument("--max_length", type=int, default=100) #Max length of input src
 parser.add_argument("--valid_src_file", type=str, default='')
@@ -41,12 +41,10 @@ PN_dict_name = 'bible_people/bible_peo+loc.pkl'
 lang = "k2e"
 
 
-# 2. Flask 객체를 app에 할당
+# app 객체로 라우팅 경로 설정
 app = Flask(__name__)
 
-# 3. app 객체를 이용해 라우팅 경로를 설정
-
-# 함수 설정
+# 모델 세팅 
 def setting():
     print("Setting models")
     torch.no_grad()
@@ -63,8 +61,6 @@ def setting():
     with open(PN_dict_name, 'rb') as f:
         PN_dict = pickle.load(f, encoding="utf-8")
 
-    ###한국어(키) 한글자짜리 뻄
-    print(len(PN_dict))
     str_temp =""
     count = 0
     for kk, vv in PN_dict.items():
@@ -72,7 +68,6 @@ def setting():
             count += 1
             str_temp += kk
             str_temp += "\n"
-    # print("count : ", count)
     one_char_name = "bible_people/name_one_char.txt"
     with open(one_char_name, 'w') as f:
         f.write(str_temp)
@@ -87,14 +82,7 @@ def setting():
 
     key_file.close()
 
-    ###영어(밸류)기준으로 긴 단어부터해서 정렬
-    ###딕트를 정렬하니까 리스트로 바뀜
     PN_list= sorted(PN_dict.items(), key=operator.itemgetter(1), reverse=True)
-    print("ch3 : ", type(PN_list[0][0]))
-    print(PN_list[0][0])
-    print(PN_list[0][1])
-
-    print(len(PN_list))
 
     k2e_trg_inv_dict = dict()
     for kk, vv in en_dict.items():
@@ -109,16 +97,18 @@ def setting():
 
     k2e_model = torch.load(k2e_model_name)
     print("k2e best model loaded")
+    
     e2k_model = torch.load(e2k_model_name)
     print("e2k best model loaded")
+    
     return k2e_model, e2k_model, k2e_trg_inv_dict, e2k_trg_inv_dict, PN_list
 
-# 4. 해당 라우팅 경로로 요청이 올 때 실행할 함수를 바로 밑에 작성해야 함
-#(해당 웹페이지에 대한 경로를 URI로 만들어준다고 이해하자)
+# 번역 페이지 실행
 @app.route("/")
 def hello():
     return render_template("k2e.html")
 
+# 한->영 번역 
 @app.route('/k2e_trans', methods=['POST', 'GET'])
 def k2e_trans(num=None):
     if request.method == 'GET':
@@ -128,21 +118,20 @@ def k2e_trans(num=None):
             return render_template("k2e.html")
         input_sen = request.form['src']
         replaced_sen = ""
-        print("src_kr : " + input_sen)
 
-        #토큰화
+        # 토큰화
         text_file = open("input.txt", "w", encoding="utf8")
         text_file.write(input_sen)
         text_file.close()
         tokenizer=check_output('./tokenizer.perl en < input.txt> input.txt.tok',shell=True)
 
-        #숫자기호화
-        number_sym=call('./web_symbolize.py',shell=True) #일단 kr -> en 만 했음.
+        # 숫자 기호화 '1 => __N0'
+        number_sym=call('./web_symbolize.py',shell=True)
         text_file = open("input.txt.tok.sym", "r", encoding="utf8")
         replaced_sen = text_file.read()
         print("number_sym : ", replaced_sen)
 
-        #성경인물 => P0
+        # 고유명사 기호화 'Trumph => __P0'
         lang = "k2e"
         replaced_sen, info_dict = convert_pn_for_web(replaced_sen, PN_list, lang)
         print("replaced_sen : " + replaced_sen)
@@ -154,13 +143,11 @@ def k2e_trans(num=None):
         text_file.write(replaced_sen)
         text_file.close()
 
-
-        #참고하는 코드 파일로 바꿔줘야함
         apply_bpe=check_output("../subword_nmt/apply_bpe.py -c " +\
                                 "./bible_people/bible_data_GYGJ+NIV/PN/subword/kr.5000.code " +\
                                 "< ./input.txt.tok.sym.pn > ./input.txt.tok.sym.pn.sub", shell=True)
 
-        #k2e 모델에 넣기
+        # k2e 모델에 입력
         valid_iter = TextIterator(args.src_file, args.kr_dict,
                                  batch_size=1, maxlen=1000,
                                  ahead=1, resume_num=0)
@@ -178,7 +165,7 @@ def k2e_trans(num=None):
         output = output.replace("&quot; ", "\"")
         output = output.replace("&quot;", "\"")
 
-        #숫자 기호화 되돌리기
+        # 숫자 기호화 되돌리기
         mapping=open("mapping.sym","rb")
         num_dict=pickle.load(mapping)
 
@@ -188,7 +175,7 @@ def k2e_trans(num=None):
             if key in output:
                 output=output.replace(key,value)
 
-        #__P0 같은거 원래대로 변환
+        # 고유명사 기호화 되돌리기
         for key, val in info_dict.items(): #key : __P0, val : 예수(한국어)
             temp = key.strip()
             if temp in output:
@@ -196,24 +183,20 @@ def k2e_trans(num=None):
                     if val == PN_key:
                         output = output.replace(temp, PN_val)
 
-
-        print("output2 : ", output)
-
         return render_template('k2e.html', src_contents = input_sen, trans_contents = output)
+    
     else:
         return render_template("k2e.html")
 
+# 영->한 번역 수행 
 @app.route('/e2k_trans', methods=['POST', 'GET'])
 def e2k_trans(num=None):
-    #야매임
     if request.method == 'GET':
         return render_template("e2k.html")
     if request.method == 'POST':
         if request.form['src'] == "":
             return render_template("e2k.html")
         input_sen = request.form['src']
-        print("src_en : ", input_sen)
-
 
         text_file = open("input.txt", "w", encoding="utf8")
         text_file.write(input_sen)
@@ -231,13 +214,12 @@ def e2k_trans(num=None):
             output = unbpe(output)
 
         output = output.replace(" &apos; ", "\'")
-        print("trans_kr : ",output)
         return render_template('e2k.html', src_contents = input_sen, trans_contents = output)
     else:
         return render_template("e2k.html")
 
 
-#5. 메인 모듈로 실행될 때 플라스크 서버 구동 (서버로 구동한 IP 와 포트를 옵션으로 넣어줄 수 있음)
+# 플라스크 서버 구동 
 host_addr = "203.252.112.19"
 port_num = "8888"
 
