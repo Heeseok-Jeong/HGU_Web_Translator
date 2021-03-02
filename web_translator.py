@@ -69,5 +69,3 @@ for i in range(3):
         sentence = ids2words(trg_inv_dict, samples, eos_id=EOS_token)
         sentence = unbpe(sentence)
         print("trans: ",sentence)
-        #print(sentence.replace("&apos;", "/''"))
-        #print(sentence)
