@@ -5,7 +5,7 @@
 ### 설계 핵심 아이디어 요약
 
 상용 번역기들은 고유명사를 번역할 때 정확하지 않은 경우가 있다.   
-본 연구는 Backbone NMT (Neural Machine Translation) 에 **고유명사 사전**과 **기호화**를 적용하여 기존의 한/영 번역기에서 “바람과 함께 사라지다” 같은 고유명사를 “Gone With The Wind” 가 아닌 “Vanish With The Wind” 로 번역하는 문제점을 해결하고자 한다.
+본 연구는 Backbone NMT (Neural Machine Translation) 모델에 **고유명사 사전**과 **기호화**를 적용하여 기존의 한/영 번역기에서 “바람과 함께 사라지다” 같은 고유명사를 “Gone With The Wind” 가 아닌 “Vanish With The Wind” 로 번역하는 문제점을 해결하고자 한다.
 
 #### 과정
 0) 전체 데이터에서 많이 사용된 단어를 추리고 그 중 고유명사를 골라내어 **고유명사 사전**을 만든다. 
