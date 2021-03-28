@@ -219,7 +219,7 @@ def e2k_trans(num=None):
         return render_template("e2k.html")
 
 
-# 플라스크 서버 구동 
+# 서버 구동 
 host_addr = "203.252.112.19"
 port_num = "8888"
 
