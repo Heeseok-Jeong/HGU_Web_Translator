@@ -24,6 +24,7 @@
 상용 번역기들은 우수한 성능을 보이고 있으나, 문장 내에 이름이나 영화 제목과 같은 고유명사를 번역할 때 정확하지 않은 문제가 있다.  
 아래의 번역은 2019년 11월 25일 기준 결과이다.
 
+예시)
 입력 문장: 어제 조카랑 ‘겨울 왕국’을 봤어.
   - 파파고 번역: I saw ‘Winter Kingdom’ with my nephew yesterday.
   - 구글 번역기: I saw your niece and the Winter Kingdom yesterday.
