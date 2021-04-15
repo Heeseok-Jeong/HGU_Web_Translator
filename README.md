@@ -9,7 +9,7 @@
 
 ### 과정
 0) 전체 데이터에서 많이 사용된 단어를 추리고 그 중 고유명사를 골라내어 **고유명사 사전**을 만든다. 
-1) Backbone NMT 모델 Seq2seq 와 Transformer 에 데이터를 학습 시킬 때, 고유명사 사전에 있는 단어들은 기호로 치환하여 학습한다.
+1) Backbone NMT 모델 Seq2seq with attention와 Transformer 에 데이터를 학습 시킬 때, 고유명사 사전에 있는 단어들은 기호로 치환하여 학습한다.
 2) 학습된 모델은 고유명사를 직접 번역하지 않고 기호로 치환하여 출력한다.
 3) 학습이 완료된 모델에 문장을 넣으면 고유명사 사전에 있는 단어는 기호로 치환되어 모델에 들어가고, 모델이 출력한 문장가 있다면 고유명사 사전에서 해당 단어를 치환하여 최종 문장을 출력한다.
 
@@ -41,7 +41,7 @@ __사용된 기술:__
 
 <p align="center"> <img width="585" alt="스크린샷 2020-03-27 오후 2 31 37" src="https://user-images.githubusercontent.com/37679062/77750627-77ad2600-7067-11ea-8ad0-0e225778482a.JPG"> </p>
 
-*학습 모델에 `Transformer` 도 포함.
+*학습 모델 : `Seq2seq with attention`, `Transformer`
 
 <hr>
 
