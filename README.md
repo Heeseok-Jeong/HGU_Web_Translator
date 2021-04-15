@@ -41,7 +41,7 @@ __사용된 기술:__
 
 <p align="center"> <img width="585" alt="스크린샷 2020-03-27 오후 2 31 37" src="https://user-images.githubusercontent.com/37679062/77750627-77ad2600-7067-11ea-8ad0-0e225778482a.JPG"> </p>
 
-*학습모델에 Transformer 도 포함.
+*학습 모델에 `Transformer` 도 포함.
 
 <hr>
 
